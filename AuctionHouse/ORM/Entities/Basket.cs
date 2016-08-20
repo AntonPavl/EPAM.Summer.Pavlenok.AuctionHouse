@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace ORM.Entities
 {
@@ -10,7 +11,7 @@ namespace ORM.Entities
         }
         public int Id { get; set; }
         public string Name { get; set; }
-        public int UserId { get; set; }
+        [Required]
         public virtual User User { get; set; }
         public virtual List<Lot> Lots { get; set; }
     }

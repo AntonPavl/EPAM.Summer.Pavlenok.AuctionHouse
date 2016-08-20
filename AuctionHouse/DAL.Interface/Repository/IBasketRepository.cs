@@ -11,7 +11,7 @@ namespace DAL.Interface.Repository
     {
         DalBasket GetBasketByUser(DalUser user);
         DalBasket GetBasketByName(string name);
-        void AddLot(DalLot lot);
-        void RemoveLot(DalLot lot);
+        void AddLot(DalLot lot,DalBasket item);
+        void RemoveLot(DalLot lot, DalBasket item);
     }
 }

@@ -43,6 +43,8 @@
     <Compile Include="Entities\BasketEntity.cs" />
     <Compile Include="Entities\LotEntity.cs" />
     <Compile Include="Entities\ProfileEntity.cs" />
+    <Compile Include="Entities\RoleEntity.cs" />
+    <Compile Include="Entities\TagEntity.cs" />
     <Compile Include="Entities\UserEntity.cs" />
     <Compile Include="Entities\WalletEntity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

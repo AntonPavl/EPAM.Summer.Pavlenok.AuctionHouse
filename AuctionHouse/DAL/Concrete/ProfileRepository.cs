@@ -5,19 +5,32 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Linq.Expressions;
+using System.Data.Entity;
+using ORM.Entities;
+using DAL.Mappers;
 
 namespace DAL.Concrete
 {
     public class ProfileRepository : IRepository<DalProfile>
     {
+        private readonly DbContext context;
+        public ProfileRepository(DbContext context)
+        {
+            this.context = context;
+        }
+
         public void Create(DalProfile item)
         {
-            throw new NotImplementedException();
+            var profile = item.ToOrmProfile();
+            context.Set<Profile>().Add(profile);
         }
 
         public void Delete(int id)
         {
-            throw new NotImplementedException();
+            var profile = context.Set<Profile>().FirstOrDefault(x => x.Id == id);
+            if (profile != null)
+                context.Set<Profile>().Remove(profile);
         }
 
         public void Dispose()
@@ -25,24 +38,35 @@ namespace DAL.Concrete
             throw new NotImplementedException();
         }
 
-        public IEnumerable<DalProfile> GetEntities()
+        public IEnumerable<DalProfile> GetAll()
         {
-            throw new NotImplementedException();
+            var profiles = context.Set<Profile>().Select(x => x.ToDalProfile());
+            return profiles;
         }
 
-        public DalProfile GetEntity(int id)
+        public DalProfile GetById(int id)
         {
-            throw new NotImplementedException();
+            return context.Set<Profile>().FirstOrDefault(x => x.Id == id).ToDalProfile();
         }
 
-        public void Save()
+        public IEnumerable<DalProfile> GetByPredicate(Expression<Func<DalProfile, bool>> f)
         {
-            throw new NotImplementedException();
+            Func<DalProfile, bool> func = f.Compile();
+            IEnumerable<DalProfile> profiles = context.Set<Profile>().Where(x => true).AsEnumerable().
+                Select(x => x.ToDalProfile()).AsEnumerable();
+            return profiles.Where(x => func(x)).AsEnumerable();
         }
 
         public void Update(DalProfile item)
         {
-            throw new NotImplementedException();
+            var profile = context.Set<Profile>().FirstOrDefault(x => x.Id == item.Id);
+            if (profile != null)
+            {
+                profile.Age = item.Age;
+                profile.FirstName = item.FirstName;
+                profile.LastName = item.LastName;
+                profile.User = context.Set<User>().FirstOrDefault(x => x.Id == item.UserId);
+            }
         }
     }
 }

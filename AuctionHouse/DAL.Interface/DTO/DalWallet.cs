@@ -10,6 +10,7 @@ namespace DAL.Interface.DTO
     {
         public int Id { get; set; }
         public int Money { get; set; }
+
         public int UserId { get; set; }
     }
 }

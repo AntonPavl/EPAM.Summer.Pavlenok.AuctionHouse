@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace DAL.Interface.Repository
 {
-    public interface IProfileRepository : IRepository<DalProfile>
+    public interface IProfileRepository : IRepository<DalRole>
     {
-        DalProfile GetProfileByUser(DalUser user);
+        DalRole GetProfileByUser(DalUser user);
     }
 }

@@ -5,19 +5,31 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Linq.Expressions;
+using System.Data.Entity;
+using ORM.Entities;
+using DAL.Mappers;
 
 namespace DAL.Concrete
 {
     public class UserRepository : IRepository<DalUser>
     {
+        private readonly DbContext context;
+        public UserRepository(DbContext context)
+        {
+            this.context = context;
+        }
+
         public void Create(DalUser item)
         {
-            throw new NotImplementedException();
+            context.Set<User>().Add(item.ToOrmUser());
         }
 
         public void Delete(int id)
         {
-            throw new NotImplementedException();
+            var user = context.Set<User>().FirstOrDefault(x => x.Id == id);
+            if (user != null)
+                context.Set<User>().Remove(user);
         }
 
         public void Dispose()
@@ -25,24 +37,34 @@ namespace DAL.Concrete
             throw new NotImplementedException();
         }
 
-        public IEnumerable<DalUser> GetEntities()
+        public IEnumerable<DalUser> GetAll()
         {
-            throw new NotImplementedException();
+            return context.Set<User>().Select(x => x.ToDalUser());
         }
 
-        public DalUser GetEntity(int id)
+        public DalUser GetById(int id)
         {
-            throw new NotImplementedException();
+            return context.Set<User>().FirstOrDefault(x => x.Id == id).ToDalUser();
         }
 
-        public void Save()
+        public IEnumerable<DalUser> GetByPredicate(Expression<Func<DalUser, bool>> f)
         {
-            throw new NotImplementedException();
+            Func<DalUser, bool> func = f.Compile();
+            IEnumerable<DalUser> Users = context.Set<User>().Where(x => true).AsEnumerable().Select(x => x.ToDalUser()).AsEnumerable();
+            return Users.Where(x => func(x)).AsEnumerable();
         }
 
         public void Update(DalUser item)
         {
-            throw new NotImplementedException();
+            var user = context.Set<User>().FirstOrDefault(x => x.Id == item.Id);
+            if (user!= null)
+            {
+                user.Password = item.Password;
+                user.Email = item.Email;
+                user.Wallet = context.Set<Wallet>().FirstOrDefault(x => x.Id == item.WalletId);
+                user.Profile = context.Set<Profile>().FirstOrDefault(x => x.Id == item.ProfileId);
+                user.Basket = context.Set<Basket>().FirstOrDefault(x => x.Id == item.BasketId);
+            }
         }
     }
 }
