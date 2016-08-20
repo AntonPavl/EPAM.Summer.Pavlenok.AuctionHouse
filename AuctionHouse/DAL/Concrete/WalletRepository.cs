@@ -12,7 +12,7 @@ using DAL.Mappers;
 
 namespace DAL.Concrete
 {
-    public class WalletRepository : IRepository<DalWallet>
+    public class WalletRepository : IWalletRepository
     {
         private readonly DbContext context;
         public WalletRepository(DbContext context)
@@ -52,6 +52,11 @@ namespace DAL.Concrete
             Func<DalWallet, bool> func = f.Compile();
             IEnumerable<DalWallet> Wallets = context.Set<Wallet>().Where(x => true).AsEnumerable().Select(x => x.ToDalWallet()).AsEnumerable();
             return Wallets.Where(x => func(x)).AsEnumerable();
+        }
+
+        public DalWallet GetWalletByUser(DalUser user)
+        {
+            return context.Set<Wallet>().FirstOrDefault(x => x.User.Id == user.Id).ToDalWallet();
         }
 
         public void Update(DalWallet item)

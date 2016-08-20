@@ -12,7 +12,7 @@ using DAL.Mappers;
 
 namespace DAL.Concrete
 {
-    public class TagRepository : IRepository<DalTag>
+    public class TagRepository : ITagRepository
     {
         private readonly DbContext context;
         public TagRepository(DbContext context)
@@ -52,6 +52,11 @@ namespace DAL.Concrete
             Func<DalTag, bool> func = f.Compile();
             IEnumerable<DalTag> Tags = context.Set<Tag>().Where(x => true).AsEnumerable().Select(x => x.ToDalTag()).AsEnumerable();
             return Tags.Where(x => func(x)).AsEnumerable();
+        }
+
+        public DalTag GetTagByName(string name)
+        {
+            return context.Set<Tag>().FirstOrDefault(x => x.Name == name).ToDalTag();
         }
 
         public void Update(DalTag item)

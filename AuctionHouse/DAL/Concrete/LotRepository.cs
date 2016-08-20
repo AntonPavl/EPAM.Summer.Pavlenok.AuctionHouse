@@ -12,12 +12,17 @@ using System.Linq.Expressions;
 
 namespace DAL.Concrete
 {
-    public class LotRepository : IRepository<DalLot>
+    public class LotRepository : ILotRepository
     {
         private readonly DbContext context;
         public LotRepository(DbContext context)
         {
             this.context = context;
+        }
+
+        public void AddTag(DalTag tag)
+        {
+            throw new NotImplementedException();
         }
 
         public void Create(DalLot item)
@@ -43,6 +48,11 @@ namespace DAL.Concrete
             return lots;
         }
 
+        public IEnumerable<DalLot> GetByCostRange(int costOne, int costTwo)
+        {
+            throw new NotImplementedException();
+        }
+
         public DalLot GetById(int id)
         {
             return context.Set<Lot>().FirstOrDefault(x => x.Id == id).ToDalLot();
@@ -53,6 +63,30 @@ namespace DAL.Concrete
             Func<DalLot, bool> func = f.Compile();
             IEnumerable<DalLot> lots = context.Set<Lot>().Where(x => true).AsEnumerable().Select(x => x.ToDalLot()).AsEnumerable();
             return lots.Where(x => func(x)).AsEnumerable();
+        }
+
+        public DalUser GetGamer(DalLot item)
+        {
+            return context.Set<User>().FirstOrDefault(x => x.Id == item.GamerId).ToDalUser();
+        }
+
+        public DalUser GetOwner(DalLot item)
+        {
+            return context.Set<User>().FirstOrDefault(x => x.Id == item.OwnerId).ToDalUser();
+        }
+
+        public void RemoveTag(DalTag daltag,DalLot item)
+        {
+            var tag = context.Set<Tag>().FirstOrDefault(x => x.Id == daltag.Id);
+            var lot = context.Set<Lot>().FirstOrDefault(x => x.Id == item.Id);
+            if (tag!= null && lot!=null)
+              lot.Tags.Remove(tag);
+        }
+
+        public void SetGamer(DalUser gamer,DalLot item)
+        {
+            var user = context.Set<User>().FirstOrDefault(x => x.Id == gamer.Id);
+            context.Set<Lot>().FirstOrDefault(x => x.Id == item.Id).Gamer = user;
         }
 
         public void Update(DalLot item)

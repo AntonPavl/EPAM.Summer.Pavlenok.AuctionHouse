@@ -12,13 +12,14 @@ using DAL.Mappers;
 
 namespace DAL.Concrete
 {
-    public class ProfileRepository : IRepository<DalProfile>
+    public class ProfileRepository : IProfileRepository
     {
         private readonly DbContext context;
         public ProfileRepository(DbContext context)
         {
             this.context = context;
         }
+
 
         public void Create(DalProfile item)
         {
@@ -49,12 +50,18 @@ namespace DAL.Concrete
             return context.Set<Profile>().FirstOrDefault(x => x.Id == id).ToDalProfile();
         }
 
+
         public IEnumerable<DalProfile> GetByPredicate(Expression<Func<DalProfile, bool>> f)
         {
             Func<DalProfile, bool> func = f.Compile();
             IEnumerable<DalProfile> profiles = context.Set<Profile>().Where(x => true).AsEnumerable().
                 Select(x => x.ToDalProfile()).AsEnumerable();
             return profiles.Where(x => func(x)).AsEnumerable();
+        }
+
+        public DalProfile GetProfileByUser(DalUser user)
+        {
+            return context.Set<Profile>().FirstOrDefault(x => x.User.Id == user.Id).ToDalProfile();
         }
 
         public void Update(DalProfile item)

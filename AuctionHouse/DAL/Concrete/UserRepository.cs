@@ -12,7 +12,7 @@ using DAL.Mappers;
 
 namespace DAL.Concrete
 {
-    public class UserRepository : IRepository<DalUser>
+    public class UserRepository : IUserRepository
     {
         private readonly DbContext context;
         public UserRepository(DbContext context)
@@ -47,11 +47,35 @@ namespace DAL.Concrete
             return context.Set<User>().FirstOrDefault(x => x.Id == id).ToDalUser();
         }
 
+        public DalUser GetByLogin(string login)
+        {
+            return context.Set<User>().FirstOrDefault(x => x.Email == login).ToDalUser();
+        }
+
         public IEnumerable<DalUser> GetByPredicate(Expression<Func<DalUser, bool>> f)
         {
             Func<DalUser, bool> func = f.Compile();
             IEnumerable<DalUser> Users = context.Set<User>().Where(x => true).AsEnumerable().Select(x => x.ToDalUser()).AsEnumerable();
             return Users.Where(x => func(x)).AsEnumerable();
+        }
+
+        public IEnumerable<DalUser> GetByRole(DalRole dalrole)
+        {
+            var role = context.Set<Role>().FirstOrDefault(x => x.Id == dalrole.Id);
+            return context.Set<User>().Where(x => x.Roles.Contains(role)).Select(x => x.ToDalUser());
+        }
+
+        public bool IfExist(string login)
+        {
+            return context.Set<User>().FirstOrDefault(x => x.Email == login) != null ? true : false;
+        }
+
+        public void SetRole(DalUser daluser, DalRole dalrole)
+        {
+            var user = context.Set<User>().FirstOrDefault(x => x.Id == daluser.Id);
+            var role = context.Set<Role>().FirstOrDefault(x => x.Id == dalrole.Id);
+            if (!user.Roles.Contains(role))
+                  user.Roles.Add(role);
         }
 
         public void Update(DalUser item)

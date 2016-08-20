@@ -12,7 +12,7 @@ using DAL.Mappers;
 
 namespace DAL.Concrete
 {
-    public class RoleRepository : IRepository<DalRole>
+    public class RoleRepository : IRoleRepository
     {
         private readonly DbContext context;
         public RoleRepository(DbContext context)
@@ -52,6 +52,11 @@ namespace DAL.Concrete
             Func<DalRole, bool> func = f.Compile();
             IEnumerable<DalRole> Roles = context.Set<Role>().Where(x => true).AsEnumerable().Select(x => x.ToDalRole()).AsEnumerable();
             return Roles.Where(x => func(x)).AsEnumerable();
+        }
+
+        public IEnumerable<DalRole> GetUsersRoles(DalUser user)
+        {
+            return context.Set<User>().FirstOrDefault(x => x.Id == user.Id).Roles.Select(x => x.ToDalRole());
         }
 
         public void Update(DalRole item)
